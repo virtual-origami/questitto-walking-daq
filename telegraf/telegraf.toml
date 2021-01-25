@@ -1,0 +1,47 @@
+[agent]
+    interval = "20s"
+    round_interval = true
+    metric_batch_size = 1000
+    metric_buffer_limit = 10000
+    collection_jitter = "0s"
+    flush_interval = "10s"
+    flush_jitter = "0s"
+    precision = ""
+    debug = true
+    quiet = false
+    hostname = ""
+    omit_hostname = true
+
+#############################################################
+#                   OUTPUT PLUGINS                          #
+#############################################################
+[[outputs.socket_writer]]
+    address = "${TG_QUESTDB_SOCKET}"
+
+##################################################################
+#                   INPUT PLUGINS                                #
+##################################################################
+
+[[inputs.mqtt_consumer]]
+
+    servers = [ "tcp://mosquitto:1883" ]
+
+    # Topics to subscribe to:
+    topics = [
+        "IOT/+/motion",
+        "IOT/+/gps"
+    ]
+
+    # Telegraf will also store the topic as a tag with name `topic`
+    # NOTE: necessary for the Processor REGEX to extract <Sensor_ID>
+    topic_tag = "topic"
+
+    # UNCOMMENT IF MQTT AUTHENTICATION ENABLED
+    # username = "${TG_MOSQUITTO_USERNAME}"
+    # password = "${TG_MOSQUITTO_PASSWORD}"
+
+    # Connection timeout
+    connection_timeout = "30s"
+
+    # Incoming MQTT Payload from Sensor nodes is in InfluxDB Line Protocol strings
+    data_format = "influx"
